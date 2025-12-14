@@ -37,13 +37,19 @@ async function loadDatabasesForSelect() {
     if (!databaseSelect) return;
 
     try {
-        // TODO: Load danh sách database từ API
-        // const databases = await apiService.getDatabases();
-        // renderDatabaseSelect(databases);
+        databaseSelect.innerHTML = '<option value="">Đang tải...</option>';
+        const databases = await apiService.getDatabases();
 
-        databaseSelect.innerHTML = '<option value="">-- Chọn database --</option>';
+        if (!databases || !Array.isArray(databases) || databases.length === 0) {
+            databaseSelect.innerHTML = '<option value="">Bạn chưa có database nào</option>';
+            return;
+        }
+
+        renderDatabaseSelect(databases);
     } catch (error) {
+        console.error('Error loading databases:', error);
         databaseSelect.innerHTML = '<option value="">Không thể tải danh sách database</option>';
+        showNotification('Không thể tải danh sách database: ' + error.message, 'error');
     }
 }
 

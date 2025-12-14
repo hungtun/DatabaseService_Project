@@ -59,10 +59,34 @@ class ApiService {
 
             clearTimeout(timeoutId);
 
-            const data = await response.json();
+            // Xử lý response rỗng (như 204 NoContent)
+            if (response.status === 204 || response.status === 201) {
+                return null;
+            }
+
+            // Kiểm tra content-type trước khi parse JSON
+            const contentType = response.headers.get('content-type');
+            let data = null;
+
+            if (contentType && contentType.includes('application/json')) {
+                const text = await response.text();
+                if (text && text.trim()) {
+                    try {
+                        data = JSON.parse(text);
+                    } catch (parseError) {
+                        throw new Error(`Lỗi parse JSON: ${parseError.message}. Response: ${text.substring(0, 200)}`);
+                    }
+                }
+            } else {
+                // Nếu không phải JSON, lấy text
+                const text = await response.text();
+                if (text) {
+                    throw new Error(`Server trả về không phải JSON. Response: ${text.substring(0, 200)}`);
+                }
+            }
 
             if (!response.ok) {
-                throw new Error(data.error || data.message || `HTTP ${response.status}: ${response.statusText}`);
+                throw new Error(data?.error || data?.message || `HTTP ${response.status}: ${response.statusText}`);
             }
 
             return data;
@@ -70,7 +94,10 @@ class ApiService {
             if (error.name === 'AbortError') {
                 throw new Error('Request timeout. Vui lòng thử lại.');
             }
-            throw error;
+            if (error.message) {
+                throw error;
+            }
+            throw new Error(`Lỗi kết nối: ${error.message || 'Không thể kết nối đến server'}`);
         }
     }
 
@@ -110,21 +137,17 @@ class ApiService {
     }
 
     async getDatabases() {
-        // TODO: Cần thêm endpoint này vào backend
-        // return this.request('/provision');
-        throw new Error('Endpoint chưa được triển khai');
+        return this.request('/provision');
     }
 
     async getDatabase(id) {
-        // TODO: Cần thêm endpoint này vào backend
-        // return this.request(`/provision/${id}`);
-        throw new Error('Endpoint chưa được triển khai');
+        return this.request(`/provision/${id}`);
     }
 
     async deleteDatabase(id) {
-        // TODO: Cần thêm endpoint này vào backend
-        // return this.request(`/provision/${id}`, { method: 'DELETE' });
-        throw new Error('Endpoint chưa được triển khai');
+        const result = await this.request(`/provision/${id}`, { method: 'DELETE' });
+        // DELETE trả về 204 NoContent, không có body
+        return result !== null ? result : { success: true };
     }
 
     // Query APIs
