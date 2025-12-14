@@ -215,11 +215,5 @@ FodyWeavers.xsd
 .env.local
 .env.*.local
 
-# Application settings - KHÔNG commit file chứa thông tin nhạy cảm
-**/appsettings.json
-**/appsettings.*.json
-!**/appsettings.example.json
-!**/appsettings.Development.example.json
-
 # User secrets
 secrets.json
