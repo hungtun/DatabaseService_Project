@@ -79,25 +79,25 @@ async function loadDatabases() {
     databasesList.innerHTML = '<div class="loading">Đang tải...</div>';
 
     try {
-        // TODO: Gọi API để lấy danh sách database
-        // const databases = await apiService.getDatabases();
-        // renderDatabases(databases);
-        // updateStatistics(databases.length); // Cập nhật thống kê
+        const databases = await apiService.getDatabases();
 
-        // Hiện tại chưa có API, hiển thị placeholder
-        databasesList.innerHTML = `
-            <div class="info-message">
-                <p>Chức năng hiển thị danh sách database đang được phát triển...</p>
-                <p>Vui lòng sử dụng API endpoint: GET /api/provision</p>
-            </div>
-        `;
+        // Xử lý trường hợp databases là null hoặc undefined
+        if (!databases) {
+            databasesList.innerHTML = '<div class="info-message">Bạn chưa có database nào. Hãy tạo database mới!</div>';
+            updateStatistics(0);
+            return;
+        }
 
-        // Cập nhật thống kê = 0 vì chưa có dữ liệu
-        updateStatistics(0);
+        // Đảm bảo databases là array
+        const dbArray = Array.isArray(databases) ? databases : [];
+        renderDatabases(dbArray);
+        updateStatistics(dbArray.length);
     } catch (error) {
+        console.error('Error loading databases:', error);
         databasesList.innerHTML = `
             <div class="error-message">
                 <p>Không thể tải danh sách database: ${error.message}</p>
+                <p><small>Vui lòng kiểm tra kết nối đến server và đảm bảo bạn đã đăng nhập.</small></p>
             </div>
         `;
         updateStatistics(0);
@@ -129,7 +129,6 @@ function renderDatabases(databases) {
         </div>
     `).join('');
 
-    // Cập nhật thống kê với số lượng database thực tế
     updateStatistics(databases.length);
 }
 
@@ -243,8 +242,27 @@ function setupModal() {
 }
 
 async function viewDatabase(id) {
-    // TODO: Chuyển đến trang chi tiết database
-    showNotification('Chức năng đang được phát triển', 'info');
+    try {
+        const database = await apiService.getDatabase(id);
+
+        const modal = document.getElementById('dbInfoModal');
+        const modalContent = document.getElementById('modalContent');
+
+        if (!modal || !modalContent) return;
+
+        modalContent.innerHTML = `
+            <div class="db-info">
+                <h2>Thông tin Database</h2>
+                <p><strong>ID:</strong> ${database.id}</p>
+                <p><strong>Tên Database:</strong> <code>${escapeHtml(database.databaseName)}</code></p>
+                <p><strong>Ngày tạo:</strong> ${formatDate(database.createdAt)}</p>
+            </div>
+        `;
+
+        modal.style.display = 'block';
+    } catch (error) {
+        showNotification('Không thể tải thông tin database: ' + error.message, 'error');
+    }
 }
 
 async function deleteDatabase(id) {
