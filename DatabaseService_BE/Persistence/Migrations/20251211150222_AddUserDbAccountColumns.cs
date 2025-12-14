@@ -14,7 +14,7 @@ namespace Persistence.Migrations
         {
             migrationBuilder.Sql(@"
                 SET @sql := IF(
-                    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+                    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
                      WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'Users' AND COLUMN_NAME = 'CreatedDatabaseCount') = 0,
                     'ALTER TABLE `Users` ADD COLUMN `CreatedDatabaseCount` int NOT NULL DEFAULT 0;',
                     'SELECT 1');
@@ -23,7 +23,7 @@ namespace Persistence.Migrations
 
             migrationBuilder.Sql(@"
                 SET @sql := IF(
-                    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+                    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
                      WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'Users' AND COLUMN_NAME = 'DbPassword') = 0,
                     'ALTER TABLE `Users` ADD COLUMN `DbPassword` varchar(200) NULL;',
                     'SELECT 1');
@@ -32,7 +32,7 @@ namespace Persistence.Migrations
 
             migrationBuilder.Sql(@"
                 SET @sql := IF(
-                    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+                    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
                      WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'Users' AND COLUMN_NAME = 'DbUsername') = 0,
                     'ALTER TABLE `Users` ADD COLUMN `DbUsername` varchar(64) NULL;',
                     'SELECT 1');
@@ -41,7 +41,7 @@ namespace Persistence.Migrations
 
             migrationBuilder.Sql(@"
                 SET @sql := IF(
-                    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+                    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
                      WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'Users' AND COLUMN_NAME = 'MaxDatabaseLimit') = 0,
                     'ALTER TABLE `Users` ADD COLUMN `MaxDatabaseLimit` int NOT NULL DEFAULT 3;',
                     'SELECT 1');
@@ -50,9 +50,19 @@ namespace Persistence.Migrations
 
             migrationBuilder.Sql(@"
                 SET @sql := IF(
-                    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+                    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
                      WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'Users' AND COLUMN_NAME = 'PasswordHash') = 0,
                     'ALTER TABLE `Users` ADD COLUMN `PasswordHash` varchar(400) NOT NULL DEFAULT '''';',
+                    'SELECT 1');
+                PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+            ");
+
+            // Remove old Password column if it exists
+            migrationBuilder.Sql(@"
+                SET @sql := IF(
+                    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
+                     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'Users' AND COLUMN_NAME = 'Password') > 0,
+                    'ALTER TABLE `Users` DROP COLUMN `Password`;',
                     'SELECT 1');
                 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
             ");
