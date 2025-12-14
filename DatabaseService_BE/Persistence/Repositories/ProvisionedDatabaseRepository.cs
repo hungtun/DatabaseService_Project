@@ -34,5 +34,26 @@ public class ProvisionedDatabaseRepository(AppDbContext context) : IProvisionedD
     {
         return _context.SaveChangesAsync();
     }
+
+    public Task<List<ProvisionedDatabase>> GetByUserIdAsync(int userId)
+    {
+        return _context.ProvisionedDatabases
+            .Where(p => p.UserId == userId)
+            .OrderByDescending(p => p.CreatedAt)
+            .ToListAsync();
+    }
+
+    public Task<ProvisionedDatabase?> GetByIdAsync(int id, int userId)
+    {
+        return _context.ProvisionedDatabases
+            .FirstOrDefaultAsync(p => p.Id == id && p.UserId == userId);
+    }
+
+    public Task DeleteProvisionDatabasAsync(ProvisionedDatabase db)
+    {
+        _context.ProvisionedDatabases.Remove(db);
+        return Task.CompletedTask;
+    }
+
 }
 

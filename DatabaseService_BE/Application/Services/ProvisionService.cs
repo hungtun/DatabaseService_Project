@@ -3,6 +3,7 @@ using Application.DTOs;
 using Domain.Entities;
 using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Scaffolding.Metadata;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MySqlConnector;
@@ -149,5 +150,71 @@ public class ProvisionService
         cmd.CommandText = $"GRANT ALL PRIVILEGES ON `{dbName}`.* TO `{userName}`@'%'; FLUSH PRIVILEGES;";
         await cmd.ExecuteNonQueryAsync();
     }
+
+    public async Task<List<DatabaseInfoResponse>> GetUserDatabasesAsync (int userId)
+    {
+        var databases = await _repository.GetByUserIdAsync(userId);
+
+        return databases.Select(db => new DatabaseInfoResponse
+        {
+            Id = db.Id,
+            DatabaseName = db.DatabaseName,
+            CreatedAt = db.CreatedAt,
+        }).ToList();
+    }
+
+    public async Task<DatabaseInfoResponse> GetDatabaseInfoAsync (int databaseId,int userId)
+    {
+        var database = await _repository.GetByIdAsync(databaseId, userId);
+        if (database == null) return null;
+
+        return new DatabaseInfoResponse
+        {
+            Id = database.Id,
+            DatabaseName = database.DatabaseName,
+            CreatedAt = database.CreatedAt,
+        };
+    }
+
+    public async Task<bool> DeleteDatabaseAsync (int databaseId,int userId)
+    {
+        var db = await _repository.GetByIdAsync( databaseId, userId);
+        if (db == null) return false;
+        var user = await _repository.GetUserAsync(userId);
+        if (user == null) return false;
+
+        var adminBuilder = new MySqlConnectionStringBuilder(_adminConnectionString);
+
+        await using var conn = new MySqlConnection(adminBuilder.ConnectionString);
+        await conn.OpenAsync();
+
+        await using var tx = await _dbContext.Database.BeginTransactionAsync();
+        try
+        {
+            await using var cmd = conn.CreateCommand();
+            cmd.CommandText = $"DROP DATABASE IF EXISTS `{db.DatabaseName}`;";
+            await cmd.ExecuteNonQueryAsync();
+
+            await _repository.DeleteProvisionDatabasAsync(db);
+            user.CreatedDatabaseCount = Math.Max(0, user.CreatedDatabaseCount-1);
+            await _repository.UpdateUserAsync(user);
+            await _repository.SaveChangesAsync();
+            await tx.CommitAsync();
+
+            return true;
+
+        }
+        catch (Exception ex)
+        {
+            await tx.RollbackAsync();
+            _logger.LogError(ex, "Delete database failed for {Database}", db.DatabaseName);
+            throw;
+        }
+
+    }
+
+    
+
+
 }
 

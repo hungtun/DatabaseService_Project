@@ -57,6 +57,16 @@ namespace Persistence.Migrations
                 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
             ");
 
+            // Xóa cột Password cũ (thay thế bằng PasswordHash)
+            migrationBuilder.Sql(@"
+                SET @sql := IF(
+                    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+                     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'Users' AND COLUMN_NAME = 'Password') > 0,
+                    'ALTER TABLE `Users` DROP COLUMN `Password`;',
+                    'SELECT 1');
+                PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+            ");
+
             migrationBuilder.Sql("""
                 CREATE TABLE IF NOT EXISTS `ProvisionedDatabases` (
                     `Id` int NOT NULL AUTO_INCREMENT,

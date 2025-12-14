@@ -9,5 +9,9 @@ public interface IProvisionedDatabaseRepository
     Task AddProvisionedDatabaseAsync(ProvisionedDatabase db);
     Task UpdateUserAsync(User user);
     Task SaveChangesAsync();
+    Task<List<ProvisionedDatabase>> GetByUserIdAsync(int userId);
+    Task<ProvisionedDatabase?> GetByIdAsync(int id, int userId);
+    Task DeleteProvisionDatabasAsync(ProvisionedDatabase db);
+
 }
 
