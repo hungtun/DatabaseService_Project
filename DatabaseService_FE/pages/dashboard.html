@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Database Service</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h2>Database Service</h2>
+            <div class="nav-actions">
+                <a href="query-editor.html" class="btn btn-secondary">Query Editor</a>
+                <a href="database-explorer.html" class="btn btn-secondary">Database Explorer</a>
+                <button onclick="logout()" class="btn btn-secondary">Đăng xuất</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Quản lý Database</h1>
+
+        <!-- Thống kê -->
+        <div class="statistics-section" id="statistics">
+            <!-- Sẽ được load động -->
+        </div>
+
+        <!-- Tạo Database mới -->
+        <div class="create-db-section">
+            <h2>Tạo Database mới</h2>
+            <form id="createDbForm">
+                <div class="form-group">
+                    <label for="dbName">Tên Database (tùy chọn)</label>
+                    <input type="text" id="dbName" placeholder="Để trống để tự động đặt tên">
+                    <small class="form-hint">Tên database sẽ được tạo tự động nếu để trống</small>
+                </div>
+                <button type="submit" class="btn btn-primary">Tạo Database</button>
+            </form>
+            <div id="dbError" class="error-message"></div>
+            <div id="dbSuccess" class="success-message"></div>
+        </div>
+
+        <!-- Danh sách Database -->
+        <div class="databases-section">
+            <h2>Danh sách Database của bạn</h2>
+            <div id="databasesList" class="databases-grid">
+                <!-- Sẽ được load động -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal hiển thị thông tin Database -->
+    <div id="dbInfoModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/modules/dashboard.js"></script>
+</body>
+</html>
+

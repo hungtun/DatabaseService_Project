@@ -3145,19 +3145,24 @@
     ]
   },
   "packageFolders": {
-    "/Users/hung/.nuget/packages/": {}
+    "C:\\Users\\Admin\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/hung/hacker/DatabaseService_Project/DatabaseService_BE/API/API.csproj",
+      "projectUniqueName": "C:\\Users\\Admin\\Downloads\\Documents\\DTDM\\DatabaseService_Project\\DatabaseService_BE\\API\\API.csproj",
       "projectName": "API",
-      "projectPath": "/Users/hung/hacker/DatabaseService_Project/DatabaseService_BE/API/API.csproj",
-      "packagesPath": "/Users/hung/.nuget/packages/",
-      "outputPath": "/Users/hung/hacker/DatabaseService_Project/DatabaseService_BE/API/obj/",
+      "projectPath": "C:\\Users\\Admin\\Downloads\\Documents\\DTDM\\DatabaseService_Project\\DatabaseService_BE\\API\\API.csproj",
+      "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Admin\\Downloads\\Documents\\DTDM\\DatabaseService_Project\\DatabaseService_BE\\API\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "/Users/hung/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
@@ -3169,11 +3174,11 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "/Users/hung/hacker/DatabaseService_Project/DatabaseService_BE/Application/Application.csproj": {
-              "projectPath": "/Users/hung/hacker/DatabaseService_Project/DatabaseService_BE/Application/Application.csproj"
+            "C:\\Users\\Admin\\Downloads\\Documents\\DTDM\\DatabaseService_Project\\DatabaseService_BE\\Application\\Application.csproj": {
+              "projectPath": "C:\\Users\\Admin\\Downloads\\Documents\\DTDM\\DatabaseService_Project\\DatabaseService_BE\\Application\\Application.csproj"
             },
-            "/Users/hung/hacker/DatabaseService_Project/DatabaseService_BE/Persistence/Persistence.csproj": {
-              "projectPath": "/Users/hung/hacker/DatabaseService_Project/DatabaseService_BE/Persistence/Persistence.csproj"
+            "C:\\Users\\Admin\\Downloads\\Documents\\DTDM\\DatabaseService_Project\\DatabaseService_BE\\Persistence\\Persistence.csproj": {
+              "projectPath": "C:\\Users\\Admin\\Downloads\\Documents\\DTDM\\DatabaseService_Project\\DatabaseService_BE\\Persistence\\Persistence.csproj"
             }
           }
         }
@@ -3187,8 +3192,7 @@
         "enableAudit": "true",
         "auditLevel": "low",
         "auditMode": "direct"
-      },
-      "SdkAnalysisLevel": "9.0.300"
+      }
     },
     "frameworks": {
       "net8.0": {
@@ -3228,20 +3232,6 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
-        "downloadDependencies": [
-          {
-            "name": "Microsoft.AspNetCore.App.Ref",
-            "version": "[8.0.21, 8.0.21]"
-          },
-          {
-            "name": "Microsoft.NETCore.App.Host.osx-arm64",
-            "version": "[8.0.21, 8.0.21]"
-          },
-          {
-            "name": "Microsoft.NETCore.App.Ref",
-            "version": "[8.0.21, 8.0.21]"
-          }
-        ],
         "frameworkReferences": {
           "Microsoft.AspNetCore.App": {
             "privateAssets": "none"
@@ -3250,7 +3240,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.306/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.416/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
