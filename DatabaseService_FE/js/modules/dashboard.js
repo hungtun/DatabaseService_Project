@@ -46,7 +46,7 @@ async function loadStatistics() {
             </div>
             <div class="stat-card">
                 <h3>Giới hạn</h3>
-                <p class="stat-value" id="databaseLimit">100</p>
+                <p class="stat-value" id="databaseLimit">3</p>
             </div>
         `;
 
@@ -61,6 +61,14 @@ function updateStatistics(databaseCount) {
     const countElement = document.getElementById('currentDatabasesCount');
     if (countElement) {
         countElement.textContent = databaseCount;
+    }
+
+    // Hiển thị cảnh báo nếu đã đạt giới hạn
+    const limitElement = document.getElementById('databaseLimit');
+    if (limitElement && databaseCount >= 3) {
+        countElement.style.color = '#e74c3c';
+    } else if (countElement) {
+        countElement.style.color = '';
     }
 }
 
@@ -134,6 +142,16 @@ async function handleCreateDatabase(e) {
 
     if (errorDiv) errorDiv.textContent = '';
     if (successDiv) successDiv.textContent = '';
+
+    // Kiểm tra giới hạn trước khi tạo
+    const currentCount = parseInt(document.getElementById('currentDatabasesCount')?.textContent || '0');
+    if (currentCount >= 3) {
+        if (errorDiv) {
+            errorDiv.textContent = 'Đã đạt giới hạn số lượng database (3 database). Vui lòng xóa database cũ trước khi tạo mới.';
+        }
+        showNotification('Đã đạt giới hạn số lượng database', 'error');
+        return;
+    }
 
     try {
         const response = await apiService.provisionDatabase(dbName || null);
