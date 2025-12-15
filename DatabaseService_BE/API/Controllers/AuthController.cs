@@ -1,5 +1,6 @@
 using Application.Services;
-using Application.DTOs;
+using Application.DTOs.Requests;
+using Application.DTOs.Responses;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
