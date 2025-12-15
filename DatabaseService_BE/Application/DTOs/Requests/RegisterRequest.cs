@@ -1,6 +1,6 @@
 using System;
 
-namespace Application.DTOs;
+namespace Application.DTOs.Requests;
 
 public class RegisterRequest
 {

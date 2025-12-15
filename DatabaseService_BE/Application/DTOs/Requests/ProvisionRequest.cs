@@ -1,4 +1,6 @@
-namespace Application.DTOs;
+using System;
+
+namespace Application.DTOs.Requests;
 
 public class ProvisionRequest
 {
