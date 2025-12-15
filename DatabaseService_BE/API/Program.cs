@@ -24,6 +24,9 @@ builder.Services.AddScoped<Domain.Interfaces.IProvisionedDatabaseRepository, Pro
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<ProvisionService>();
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
+builder.Services.AddScoped<DataService>();
+builder.Services.AddScoped<TableService>();
+builder.Services.AddScoped<ColumnService>();
 
 // CORS configuration for frontend
 builder.Services.AddCors(options =>
