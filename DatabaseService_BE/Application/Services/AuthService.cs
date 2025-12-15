@@ -1,7 +1,8 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Application.DTOs;
+using Application.DTOs.Requests;
+using Application.DTOs.Responses;
 using Application.Options;
 using Domain.Entities;
 using Domain.Interfaces;

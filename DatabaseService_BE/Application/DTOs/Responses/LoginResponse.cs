@@ -1,4 +1,6 @@
-namespace Application.DTOs;
+using System;
+
+namespace Application.DTOs.Responses;
 
 public class LoginResponse
 {

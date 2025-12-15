@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
-using Application.DTOs;
+using Application.DTOs.Requests;
+using Application.DTOs.Responses;
 using Domain.Entities;
 using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;

@@ -1,6 +1,6 @@
 using System;
 
-namespace Application.DTOs;
+namespace Application.DTOs.Responses;
 
 public class DatabaseInfoResponse
 {
