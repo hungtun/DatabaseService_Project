@@ -142,6 +142,14 @@ async function handleCreateDatabase(e) {
     if (errorDiv) errorDiv.textContent = '';
     if (successDiv) successDiv.textContent = '';
 
+    if (!dbName) {
+        if (errorDiv) {
+            errorDiv.textContent = 'Vui lòng nhập tên database';
+        }
+        showNotification('Tên database không được để trống', 'error');
+        return;
+    }
+
     // Kiểm tra giới hạn trước khi tạo
     const currentCount = parseInt(document.getElementById('currentDatabasesCount')?.textContent || '0');
     if (currentCount >= 3) {
@@ -153,7 +161,7 @@ async function handleCreateDatabase(e) {
     }
 
     try {
-        const response = await apiService.provisionDatabase(dbName || null);
+        const response = await apiService.provisionDatabase(dbName);
 
         if (successDiv) {
             successDiv.textContent = 'Tạo database thành công!';
@@ -242,27 +250,8 @@ function setupModal() {
 }
 
 async function viewDatabase(id) {
-    try {
-        const database = await apiService.getDatabase(id);
-
-        const modal = document.getElementById('dbInfoModal');
-        const modalContent = document.getElementById('modalContent');
-
-        if (!modal || !modalContent) return;
-
-        modalContent.innerHTML = `
-            <div class="db-info">
-                <h2>Thông tin Database</h2>
-                <p><strong>ID:</strong> ${database.id}</p>
-                <p><strong>Tên Database:</strong> <code>${escapeHtml(database.databaseName)}</code></p>
-                <p><strong>Ngày tạo:</strong> ${formatDate(database.createdAt)}</p>
-            </div>
-        `;
-
-        modal.style.display = 'block';
-    } catch (error) {
-        showNotification('Không thể tải thông tin database: ' + error.message, 'error');
-    }
+    // Chuyển sang trang Database Explorer và chọn sẵn database này
+    window.location.href = `database-explorer.html?dbId=${encodeURIComponent(id)}`;
 }
 
 async function deleteDatabase(id) {

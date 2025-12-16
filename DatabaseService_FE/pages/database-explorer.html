@@ -13,18 +13,190 @@
             <h2>Database Service</h2>
             <div class="nav-actions">
                 <a href="dashboard.html" class="btn btn-secondary">Dashboard</a>
-                <a href="query-editor.html" class="btn btn-secondary">Query Editor</a>
                 <button onclick="logout()" class="btn btn-secondary">Đăng xuất</button>
             </div>
         </div>
     </nav>
 
-    <div class="container">
-        <h1>Database Explorer</h1>
+    <div class="explorer-container">
+        <div class="explorer-layout">
+            <!-- Left sidebar: Navigator (like MySQL) -->
+            <aside class="explorer-sidebar">
+                <div class="sidebar-header">
+                    <h3>Navigator</h3>
+                </div>
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">SCHEMAS</div>
+                    <div id="explorerSidebarTree" class="sidebar-tree">
+                        <!-- Will be rendered dynamically -->
+                    </div>
+                </div>
+            </aside>
 
-        <div class="explorer-section">
-            <div id="databaseExplorer">
-                <!-- Cây cấu trúc database sẽ được load động -->
+            <!-- Right main panel: Workspace (like MySQL Result Grid) -->
+            <main class="explorer-main">
+                <div class="workspace-header">
+                    <div class="workspace-title" id="workspaceTitle">Database Explorer</div>
+                    <div class="workspace-toolbar" id="workspaceToolbar">
+                        <!-- Toolbar buttons will be shown based on selection -->
+                    </div>
+                </div>
+
+                <div class="workspace-tabs" id="workspaceTabs" style="display: none;">
+                    <button class="tab-btn active" data-tab="structure">Structure</button>
+                    <button class="tab-btn" data-tab="data">Data</button>
+                    <button class="tab-btn" data-tab="info">Info</button>
+                </div>
+
+                <div class="workspace-content" id="workspaceContent">
+                    <div class="workspace-empty">
+                        <p>Select a database or table from the Navigator to view details</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal tạo table mới -->
+    <div id="createTableModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeCreateTableModal">&times;</span>
+            <h2 style="margin-bottom: 15px;">Tạo table mới</h2>
+            <div class="form-group">
+                <label for="createTableName">Tên table</label>
+                <input type="text" id="createTableName" placeholder="Nhập tên table">
+            </div>
+            <div class="form-group">
+                <label for="createTableColumns">Cấu trúc cột (JSON array)</label>
+                <textarea id="createTableColumns" rows="5"></textarea>
+                <small class="form-hint">
+                    Ví dụ: [{"name":"id","dataType":"INT","isPrimaryKey":true,"isAutoIncrement":true,"isNullable":false},{"name":"name","dataType":"VARCHAR(255)","isNullable":false}]
+                </small>
+            </div>
+            <div class="form-actions">
+                <button id="submitCreateTable" class="btn btn-primary" type="button">Tạo</button>
+                <button id="cancelCreateTable" class="btn btn-secondary" type="button">Hủy</button>
+            </div>
+            <div id="createTableError" class="error-message"></div>
+        </div>
+    </div>
+
+    <!-- Modal thêm cột -->
+    <div id="addColumnModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeAddColumnModal">&times;</span>
+            <h2 style="margin-bottom: 15px;">Thêm cột</h2>
+            <div class="form-group">
+                <label for="addColumnName">Tên cột</label>
+                <input type="text" id="addColumnName" placeholder="Nhập tên cột" required>
+            </div>
+            <div class="form-group">
+                <label for="addColumnType">Kiểu dữ liệu</label>
+                <select id="addColumnType" class="form-control">
+                    <option value="INT">INT - Số nguyên</option>
+                    <option value="BIGINT">BIGINT - Số nguyên lớn</option>
+                    <option value="FLOAT">FLOAT - Số thực</option>
+                    <option value="DOUBLE">DOUBLE - Số thực độ chính xác cao</option>
+                    <option value="DECIMAL(10,2)">DECIMAL - Số thập phân chính xác</option>
+                    <option value="VARCHAR(255)" selected>VARCHAR(255) - Chuỗi văn bản ngắn</option>
+                    <option value="TEXT">TEXT - Văn bản dài</option>
+                    <option value="DATE">DATE - Ngày</option>
+                    <option value="DATETIME">DATETIME - Ngày giờ</option>
+                    <option value="TIMESTAMP">TIMESTAMP - Thời gian tự động</option>
+                    <option value="BOOLEAN">BOOLEAN - Đúng/Sai</option>
+                    <option value="JSON">JSON - Dữ liệu JSON</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="checkbox-inline">
+                    <input type="checkbox" id="addColumnNullable" checked>
+                    <span>Cho phép NULL</span>
+                </label>
+            </div>
+            <div class="form-group">
+                <label for="addColumnDefault">Giá trị mặc định (tùy chọn)</label>
+                <input type="text" id="addColumnDefault" placeholder="Để trống nếu không có">
+            </div>
+            <div class="form-actions">
+                <button id="submitAddColumn" class="btn btn-primary" type="button">Thêm cột</button>
+                <button id="cancelAddColumn" class="btn btn-secondary" type="button">Hủy</button>
+            </div>
+            <div id="addColumnError" class="error-message"></div>
+        </div>
+    </div>
+
+    <!-- Modal thêm dữ liệu -->
+    <div id="insertRowModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeInsertRowModal">&times;</span>
+            <h2 style="margin-bottom: 15px;">Thêm dữ liệu mới</h2>
+            <div id="insertRowForm">
+                <!-- Form fields will be generated dynamically based on table structure -->
+            </div>
+            <div class="form-actions">
+                <button id="submitInsertRow" class="btn btn-primary" type="button">Thêm</button>
+                <button id="cancelInsertRow" class="btn btn-secondary" type="button">Hủy</button>
+            </div>
+            <div id="insertRowError" class="error-message"></div>
+        </div>
+    </div>
+
+    <!-- Modal cập nhật dữ liệu -->
+    <div id="updateRowModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeUpdateRowModal">&times;</span>
+            <h2 style="margin-bottom: 15px;">Cập nhật dữ liệu</h2>
+            <div class="form-group">
+                <label for="updateRowData">Dữ liệu cần cập nhật (JSON object)</label>
+                <textarea id="updateRowData" rows="4"></textarea>
+                <small class="form-hint">
+                    Ví dụ: {"column1":"new value"}
+                </small>
+            </div>
+            <div class="form-group">
+                <label for="updateRowWhere">Điều kiện WHERE (JSON object)</label>
+                <textarea id="updateRowWhere" rows="4"></textarea>
+                <small class="form-hint">
+                    Ví dụ: {"id":1}
+                </small>
+            </div>
+            <div class="form-actions">
+                <button id="submitUpdateRow" class="btn btn-primary" type="button">Cập nhật</button>
+                <button id="cancelUpdateRow" class="btn btn-secondary" type="button">Hủy</button>
+            </div>
+            <div id="updateRowError" class="error-message"></div>
+        </div>
+    </div>
+
+    <!-- Modal xóa dữ liệu -->
+    <div id="deleteRowModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeDeleteRowModal">&times;</span>
+            <h2 style="margin-bottom: 15px;">Xóa dữ liệu</h2>
+            <div class="form-group">
+                <label for="deleteRowWhere">Điều kiện WHERE (JSON object)</label>
+                <textarea id="deleteRowWhere" rows="4"></textarea>
+                <small class="form-hint">
+                    Ví dụ: {"id":1}
+                </small>
+            </div>
+            <div class="form-actions">
+                <button id="submitDeleteRow" class="btn btn-danger" type="button">Xóa</button>
+                <button id="cancelDeleteRow" class="btn btn-secondary" type="button">Hủy</button>
+            </div>
+            <div id="deleteRowError" class="error-message"></div>
+        </div>
+    </div>
+
+    <!-- Modal xác nhận xóa table -->
+    <div id="dropTableModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeDropTableModal">&times;</span>
+            <h2 style="margin-bottom: 15px;">Xóa table</h2>
+            <p id="dropTableMessage" style="margin-bottom: 15px;"></p>
+            <div class="form-actions">
+                <button id="submitDropTable" class="btn btn-danger" type="button">Xóa</button>
+                <button id="cancelDropTable" class="btn btn-secondary" type="button">Hủy</button>
             </div>
         </div>
     </div>

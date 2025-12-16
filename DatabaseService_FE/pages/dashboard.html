@@ -12,7 +12,6 @@
         <div class="nav-container">
             <h2>Database Service</h2>
             <div class="nav-actions">
-                <a href="query-editor.html" class="btn btn-secondary">Query Editor</a>
                 <a href="database-explorer.html" class="btn btn-secondary">Database Explorer</a>
                 <button onclick="logout()" class="btn btn-secondary">Đăng xuất</button>
             </div>
@@ -32,9 +31,8 @@
             <h2>Tạo Database mới</h2>
             <form id="createDbForm">
                 <div class="form-group">
-                    <label for="dbName">Tên Database (tùy chọn)</label>
-                    <input type="text" id="dbName" placeholder="Để trống để tự động đặt tên">
-                    <small class="form-hint">Tên database sẽ được tạo tự động nếu để trống</small>
+                    <label for="dbName">Tên Database</label>
+                    <input type="text" id="dbName" placeholder="Nhập tên database" required>
                 </div>
                 <button type="submit" class="btn btn-primary">Tạo Database</button>
             </form>
