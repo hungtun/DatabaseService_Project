@@ -164,7 +164,7 @@ public class ProvisionService
         }).ToList();
     }
 
-    public async Task<DatabaseInfoResponse> GetDatabaseInfoAsync (int databaseId,int userId)
+    public async Task<DatabaseInfoResponse?> GetDatabaseInfoAsync (int databaseId,int userId)
     {
         var database = await _repository.GetByIdAsync(databaseId, userId);
         if (database == null) return null;
@@ -214,7 +214,7 @@ public class ProvisionService
 
     }
 
-    
+
 
 
 }

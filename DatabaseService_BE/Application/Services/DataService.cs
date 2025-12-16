@@ -4,6 +4,7 @@ using Domain.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MySqlConnector;
+using System.Text.Json;
 
 namespace Application.Services;
 
@@ -90,7 +91,7 @@ public class DataService
         int idx = 0;
         foreach (var value in request.Data.Values)
         {
-            cmd.Parameters.AddWithValue($"@p{idx++}", value ?? DBNull.Value);
+            cmd.Parameters.AddWithValue($"@p{idx++}", ConvertToMySqlValue(value));
         }
 
         return await cmd.ExecuteNonQueryAsync();
@@ -119,13 +120,13 @@ public class DataService
         int idx = 0;
         foreach (var value in request.Data.Values)
         {
-            cmd.Parameters.AddWithValue($"@set{idx++}", value ?? DBNull.Value);
+            cmd.Parameters.AddWithValue($"@set{idx++}", ConvertToMySqlValue(value));
         }
 
         idx = 0;
         foreach (var value in request.Where.Values)
         {
-            cmd.Parameters.AddWithValue($"@where{idx++}", value ?? DBNull.Value);
+            cmd.Parameters.AddWithValue($"@where{idx++}", ConvertToMySqlValue(value));
         }
 
         return await cmd.ExecuteNonQueryAsync();
@@ -151,7 +152,7 @@ public class DataService
         int idx = 0;
         foreach (var value in request.Where.Values)
         {
-            cmd.Parameters.AddWithValue($"@where{idx++}", value ?? DBNull.Value);
+            cmd.Parameters.AddWithValue($"@where{idx++}", ConvertToMySqlValue(value));
         }
 
         return await cmd.ExecuteNonQueryAsync();
@@ -188,5 +189,27 @@ public class DataService
     private static string EscapeIdentifier(string identifier)
     {
         return identifier.Replace("`", "``");
+    }
+
+    // Helper method to convert JsonElement or any object to appropriate value for MySQL
+    private static object? ConvertToMySqlValue(object? value)
+    {
+        if (value == null) return DBNull.Value;
+
+        // Handle JsonElement from ASP.NET Core deserialization
+        if (value is JsonElement jsonElement)
+        {
+            return jsonElement.ValueKind switch
+            {
+                JsonValueKind.String => jsonElement.GetString(),
+                JsonValueKind.Number => jsonElement.TryGetInt64(out var longVal) ? longVal : jsonElement.GetDouble(),
+                JsonValueKind.True => true,
+                JsonValueKind.False => false,
+                JsonValueKind.Null => DBNull.Value,
+                _ => jsonElement.ToString()
+            };
+        }
+
+        return value;
     }
 }

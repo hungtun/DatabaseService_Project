@@ -150,32 +150,109 @@ class ApiService {
         return result !== null ? result : { success: true };
     }
 
-    // Query APIs
-    async executeQuery(databaseName, query) {
-        // TODO: Cần thêm endpoint này vào backend
-        // return this.request('/query', {
-        //     method: 'POST',
-        //     body: JSON.stringify({ databaseName, query })
-        // });
-        throw new Error('Endpoint chưa được triển khai');
+    // Database Explorer APIs
+    async getTables(databaseId) {
+        // GET api/databases/{databaseId}/tables
+        return this.request(`/databases/${encodeURIComponent(databaseId)}/tables`);
     }
 
-    async getTables(databaseName) {
-        // TODO: Cần thêm endpoint này vào backend
-        // return this.request(`/provision/${databaseName}/tables`);
-        throw new Error('Endpoint chưa được triển khai');
+    async getTableStructure(databaseId, tableName) {
+        // GET api/databases/{databaseId}/tables/{tableName}/columns
+        return this.request(
+            `/databases/${encodeURIComponent(databaseId)}/tables/${encodeURIComponent(tableName)}/columns`
+        );
     }
 
-    async getTableStructure(databaseName, tableName) {
-        // TODO: Cần thêm endpoint này vào backend
-        // return this.request(`/provision/${databaseName}/tables/${tableName}/structure`);
-        throw new Error('Endpoint chưa được triển khai');
+    async getTableData(databaseId, tableName, page = 1, pageSize = 100) {
+        // GET api/databases/{databaseId}/data/tables/{tableName}?page=&pageSize=
+        const query = `?page=${encodeURIComponent(page)}&pageSize=${encodeURIComponent(pageSize)}`;
+        return this.request(
+            `/databases/${encodeURIComponent(databaseId)}/data/tables/${encodeURIComponent(tableName)}${query}`
+        );
     }
 
-    async getTableData(databaseName, tableName, page = 1, limit = 100) {
-        // TODO: Cần thêm endpoint này vào backend
-        // return this.request(`/provision/${databaseName}/tables/${tableName}/data?page=${page}&limit=${limit}`);
-        throw new Error('Endpoint chưa được triển khai');
+    async createTable(databaseId, payload) {
+        // POST api/databases/{databaseId}/tables
+        return this.request(`/databases/${encodeURIComponent(databaseId)}/tables`, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+    }
+
+    async dropTable(databaseId, tableName) {
+        // DELETE api/databases/{databaseId}/tables/{tableName}
+        return this.request(
+            `/databases/${encodeURIComponent(databaseId)}/tables/${encodeURIComponent(tableName)}`,
+            { method: 'DELETE' }
+        );
+    }
+
+    async getColumns(databaseId, tableName) {
+        // GET api/databases/{databaseId}/tables/{tableName}/columns
+        return this.getTableStructure(databaseId, tableName);
+    }
+
+    async addColumn(databaseId, tableName, payload) {
+        // POST api/databases/{databaseId}/tables/{tableName}/columns
+        return this.request(
+            `/databases/${encodeURIComponent(databaseId)}/tables/${encodeURIComponent(tableName)}/columns`,
+            {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            }
+        );
+    }
+
+    async modifyColumn(databaseId, tableName, payload) {
+        // PUT api/databases/{databaseId}/tables/{tableName}/columns
+        return this.request(
+            `/databases/${encodeURIComponent(databaseId)}/tables/${encodeURIComponent(tableName)}/columns`,
+            {
+                method: 'PUT',
+                body: JSON.stringify(payload)
+            }
+        );
+    }
+
+    async dropColumn(databaseId, tableName, columnName) {
+        // DELETE api/databases/{databaseId}/tables/{tableName}/columns/{columnName}
+        return this.request(
+            `/databases/${encodeURIComponent(databaseId)}/tables/${encodeURIComponent(tableName)}/columns/${encodeURIComponent(columnName)}`,
+            { method: 'DELETE' }
+        );
+    }
+
+    async insertData(databaseId, payload) {
+        // POST api/databases/{databaseId}/data/insert
+        return this.request(
+            `/databases/${encodeURIComponent(databaseId)}/data/insert`,
+            {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            }
+        );
+    }
+
+    async updateData(databaseId, payload) {
+        // PUT api/databases/{databaseId}/data/update
+        return this.request(
+            `/databases/${encodeURIComponent(databaseId)}/data/update`,
+            {
+                method: 'PUT',
+                body: JSON.stringify(payload)
+            }
+        );
+    }
+
+    async deleteData(databaseId, payload) {
+        // DELETE api/databases/{databaseId}/data/delete
+        return this.request(
+            `/databases/${encodeURIComponent(databaseId)}/data/delete`,
+            {
+                method: 'DELETE',
+                body: JSON.stringify(payload)
+            }
+        );
     }
 }
 
