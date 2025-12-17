@@ -29,16 +29,19 @@ builder.Services.AddScoped<TableService>();
 builder.Services.AddScoped<ColumnService>();
 
 // CORS configuration for frontend
-builder.Services.AddCors(options =>
+var allowedOrigins = new List<string>
 {
-    options.AddPolicy("AllowFrontend", policy =>
-    {
-        policy.WithOrigins("http://localhost:5500", "http://127.0.0.1:5500")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
-    });
-});
+    "http://localhost:5500", 
+    "http://127.0.0.1:5500"
+};
+
+
+// Thử lấy từ EC2 metadata (chỉ hoạt động trên EC2)
+using var client = new HttpClient();
+client.Timeout = TimeSpan.FromSeconds(2);
+var publicIp = await client.GetStringAsync("http://169.254.169.254/latest/meta-data/public-ipv4");
+
+
 
 var jwtOptions = builder.Configuration.GetSection("Jwt").Get<JwtOptions>() ?? new JwtOptions();
 var key = Encoding.UTF8.GetBytes(jwtOptions.Secret);
