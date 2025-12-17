@@ -31,15 +31,23 @@ builder.Services.AddScoped<ColumnService>();
 // CORS configuration for frontend
 var allowedOrigins = new List<string>
 {
-    "http://localhost:5500", 
+    "http://localhost:5500",
     "http://127.0.0.1:5500"
 };
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins(allowedOrigins.ToArray())
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 
-// Thử lấy từ EC2 metadata (chỉ hoạt động trên EC2)
-using var client = new HttpClient();
-client.Timeout = TimeSpan.FromSeconds(2);
-var publicIp = await client.GetStringAsync("http://169.254.169.254/latest/meta-data/public-ipv4");
+// Public IP for provisioning connection strings
+// On local machine, EC2 metadata endpoint is unreachable, so always use configuration value.
+var publicIp = builder.Configuration["PublicIp"] ?? "localhost";
 
 
 
