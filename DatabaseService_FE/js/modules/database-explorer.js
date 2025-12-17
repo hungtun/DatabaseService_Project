@@ -75,7 +75,7 @@ function renderDatabaseTree() {
                 <span>${escapeHtml(name)}</span>
             </div>
         `;
-
+        
         if (isExpanded && explorerTablesCache[id]) {
             html += '<div class="table-list-container">';
             explorerTablesCache[id].forEach(table => {
