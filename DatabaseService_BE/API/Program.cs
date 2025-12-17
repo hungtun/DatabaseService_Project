@@ -32,8 +32,18 @@ builder.Services.AddScoped<ColumnService>();
 var allowedOrigins = new List<string>
 {
     "http://localhost:5500",
+    "http://localhost:5500",
     "http://127.0.0.1:5500"
 };
+
+// Lấy PublicIp từ appsettings (appsettings.json / appsettings.Development.json)
+var publicIp = builder.Configuration["PublicIp"];
+
+if (!string.IsNullOrWhiteSpace(publicIp))
+{
+    allowedOrigins.Add($"http://{publicIp}:5500");
+    allowedOrigins.Add($"http://{publicIp}:5003");
+}
 
 builder.Services.AddCors(options =>
 {
@@ -41,13 +51,10 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(allowedOrigins.ToArray())
             .AllowAnyHeader()
-            .AllowAnyMethod();
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
-
-// Public IP for provisioning connection strings
-// On local machine, EC2 metadata endpoint is unreachable, so always use configuration value.
-var publicIp = builder.Configuration["PublicIp"] ?? "localhost";
 
 
 
@@ -123,7 +130,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
 
 // CORS must be before Authentication and Authorization
 app.UseCors("AllowFrontend");
