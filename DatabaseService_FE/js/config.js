@@ -1,7 +1,7 @@
 // Cấu hình ứng dụng
 const CONFIG = {
     // URL backend API
-    API_BASE_URL: 'http://localhost:5003/api',
+    API_BASE_URL: 'http://98.92.70.23:5003/api',
 
     // Thời gian timeout cho request (ms)
     REQUEST_TIMEOUT: 30000,
@@ -19,6 +19,6 @@ const CONFIG = {
     USER_KEY: 'db_service_user',
 
     // Định dạng ngày tháng
-    DATE_FORMAT: 'DD/MM/YYYY HH:mm:ss'
+    DATE_FORMAT: 'DD/MM/YYYY HH:mm:ss',
 };
 
