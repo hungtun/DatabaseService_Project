@@ -129,7 +129,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
 
 // CORS must be before Authentication and Authorization
 app.UseCors("AllowFrontend");
