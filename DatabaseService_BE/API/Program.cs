@@ -29,14 +29,27 @@ builder.Services.AddScoped<TableService>();
 builder.Services.AddScoped<ColumnService>();
 
 // CORS configuration for frontend
+var publicIp = builder.Configuration["PublicIp"] ?? "localhost";
+var allowedOrigins = new List<string>
+{
+    "http://localhost:5500", 
+    "http://127.0.0.1:5500"
+};
+
+if (!string.IsNullOrEmpty(publicIp) && publicIp != "localhost")
+{
+    allowedOrigins.Add($"http://{publicIp}:5500");
+    allowedOrigins.Add($"http://{publicIp}:5003");
+}
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:5500", "http://127.0.0.1:5500")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
+        policy.WithOrigins(allowedOrigins.ToArray())
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 
