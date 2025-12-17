@@ -8,6 +8,7 @@ public class ColumnInfoResponse
     public string DataType { get; set; } = string.Empty;
     public bool IsNullable { get; set; } 
     public bool IsPrimaryKey { get; set;}
+    public bool IsAutoIncrement { get; set; }
     public string? DefaultValue { get; set; }
     public int? MaxLength { get; set;}
 }
