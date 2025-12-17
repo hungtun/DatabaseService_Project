@@ -64,18 +64,24 @@
             <h2 style="margin-bottom: 15px;">Tạo table mới</h2>
             <div class="form-group">
                 <label for="createTableName">Tên table</label>
-                <input type="text" id="createTableName" placeholder="Nhập tên table">
+                <input type="text" id="createTableName" placeholder="Nhập tên table" required>
             </div>
             <div class="form-group">
-                <label for="createTableColumns">Cấu trúc cột (JSON array)</label>
-                <textarea id="createTableColumns" rows="5"></textarea>
-                <small class="form-hint">
-                    Ví dụ: [{"name":"id","dataType":"INT","isPrimaryKey":true,"isAutoIncrement":true,"isNullable":false},{"name":"name","dataType":"VARCHAR(255)","isNullable":false}]
-                </small>
+                <div style="margin-bottom: 8px; color: #7f8c8d; font-size: 14px;">
+                    Table sẽ luôn được tạo với cột <strong>id</strong>. Bạn có thể chọn id có là khóa chính và có tự tăng hay không.
+                </div>
+                <label class="checkbox-inline" style="display: block; margin-bottom: 6px;">
+                    <input type="checkbox" id="createTableIdPrimaryKey" checked>
+                    <span>Đặt id làm khóa chính (PRIMARY KEY)</span>
+                </label>
+               
             </div>
             <div class="form-actions">
                 <button id="submitCreateTable" class="btn btn-primary" type="button">Tạo</button>
                 <button id="cancelCreateTable" class="btn btn-secondary" type="button">Hủy</button>
+            </div>
+            <div id="createTableInfo" class="info-message" style="margin-top: 10px; display: none;">
+                Sau khi tạo table, bạn có thể thêm các cột khác bằng nút "Thêm cột"
             </div>
             <div id="createTableError" class="error-message"></div>
         </div>
