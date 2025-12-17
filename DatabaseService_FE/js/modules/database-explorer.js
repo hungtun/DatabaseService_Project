@@ -75,7 +75,7 @@ function renderDatabaseTree() {
                 <span>${escapeHtml(name)}</span>
             </div>
         `;
-
+        
         if (isExpanded && explorerTablesCache[id]) {
             html += '<div class="table-list-container">';
             explorerTablesCache[id].forEach(table => {
@@ -509,20 +509,22 @@ async function loadInfoTab(container) {
 
 async function openCreateTable() {
     if (!explorerCurrentDatabaseId) {
-        showNotification('Please select a database first', 'error');
+        showNotification('Vui lòng chọn database trước', 'error');
         return;
     }
 
     const modal = document.getElementById('createTableModal');
     const nameInput = document.getElementById('createTableName');
-    const columnsInput = document.getElementById('createTableColumns');
+    const pkCheckbox = document.getElementById('createTableIdPrimaryKey');
     const errorDiv = document.getElementById('createTableError');
+    const infoDiv = document.getElementById('createTableInfo');
 
-    if (!modal || !nameInput || !columnsInput || !errorDiv) return;
+    if (!modal || !nameInput || !errorDiv) return;
 
     nameInput.value = '';
-    columnsInput.value = '[{"name":"id","dataType":"INT","isPrimaryKey":true,"isAutoIncrement":true,"isNullable":false},{"name":"name","dataType":"VARCHAR(255)","isNullable":false}]';
+    if (pkCheckbox) pkCheckbox.checked = true;
     errorDiv.textContent = '';
+    if (infoDiv) infoDiv.style.display = 'block';
 
     modal.style.display = 'block';
     nameInput.focus();
@@ -796,44 +798,47 @@ function setupCreateTableModal() {
     if (submitBtn) {
         submitBtn.addEventListener('click', async function() {
             const nameInput = document.getElementById('createTableName');
-            const columnsInput = document.getElementById('createTableColumns');
+            const pkCheckbox = document.getElementById('createTableIdPrimaryKey');
             const errorDiv = document.getElementById('createTableError');
 
             if (!explorerCurrentDatabaseId) {
-                showNotification('Please select a database first', 'error');
+                showNotification('Vui lòng chọn database trước', 'error');
                 return;
             }
 
-            if (!nameInput || !columnsInput || !errorDiv) return;
+            if (!nameInput || !errorDiv) return;
 
             const tableName = nameInput.value.trim();
             if (!tableName) {
-                errorDiv.textContent = 'Table name is required';
+                errorDiv.textContent = 'Tên table không được để trống';
                 return;
             }
 
-            let columns;
-            try {
-                columns = JSON.parse(columnsInput.value);
-                if (!Array.isArray(columns) || columns.length === 0) {
-                    throw new Error('Columns must be a non-empty array');
-                }
-            } catch (err) {
-                errorDiv.textContent = 'Invalid JSON: ' + err.message;
-                return;
-            }
+            const makePk = pkCheckbox ? pkCheckbox.checked : true;
+
+            const columns = [{
+                name: 'id',
+                dataType: 'INT',
+                isPrimaryKey: makePk,
+                isAutoIncrement: false,
+                isNullable: false
+            }];
 
             errorDiv.textContent = '';
 
             try {
                 await apiService.createTable(explorerCurrentDatabaseId, { tableName, columns });
-                showNotification('Table created successfully', 'success');
+                showNotification('Tạo table thành công!', 'success');
                 closeModal();
-                // Refresh tables
+                // Refresh tables and open the new table
                 delete explorerTablesCache[explorerCurrentDatabaseId];
                 await toggleDatabase(explorerCurrentDatabaseId, explorerCurrentDatabaseName);
+                // Select the newly created table
+                await selectTable(explorerCurrentDatabaseId, explorerCurrentDatabaseName, tableName);
+                // Switch to structure tab so user can add columns
+                switchTab('structure');
             } catch (error) {
-                errorDiv.textContent = error.message || 'Cannot create table';
+                errorDiv.textContent = error.message || 'Không thể tạo table';
             }
         });
     }
