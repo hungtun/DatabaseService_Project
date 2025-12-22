@@ -16,7 +16,8 @@ app.use((req, res, next) => {
   next();
 });
 
-// Proxy middleware for API requests - MUST be before static files
+// Proxy middleware for API requests - MUST be before static files and body parser
+// Don't parse body for /api routes - let proxy forward raw body stream
 // All requests to /api/* will be forwarded to backend
 app.use(
   "/api",
@@ -26,26 +27,42 @@ app.use(
     pathRewrite: {
       "^/api": "/api", // Keep the /api prefix
     },
+    // Important: Don't parse body here, let proxy handle it
     // Forward all HTTP methods
     onProxyReq: (proxyReq, req, res) => {
       // Log proxy requests for debugging
       console.log(
         `[PROXY] ${req.method} ${req.url} -> ${BACKEND_URL}${req.url}`
       );
-      // Log headers
-      console.log(`[PROXY] Headers:`, JSON.stringify(req.headers, null, 2));
+      // Log Content-Type header
+      if (req.headers["content-type"]) {
+        console.log(`[PROXY] Content-Type: ${req.headers["content-type"]}`);
+      }
     },
     onProxyRes: (proxyRes, req, res) => {
       // Log proxy responses for debugging
-      console.log(`[PROXY] Response: ${proxyRes.statusCode} for ${req.url}`);
+      console.log(
+        `[PROXY] Response: ${proxyRes.statusCode} ${proxyRes.statusMessage} for ${req.url}`
+      );
+      // Log response headers
+      console.log(
+        `[PROXY] Response Headers:`,
+        JSON.stringify(proxyRes.headers, null, 2)
+      );
     },
     onError: (err, req, res) => {
       console.error(`[PROXY ERROR] ${err.message} for ${req.url}`);
-      res.status(500).json({
-        success: false,
-        error: "Proxy error: Cannot connect to backend server",
-      });
+      console.error(`[PROXY ERROR] Stack:`, err.stack);
+      if (!res.headersSent) {
+        res.status(500).json({
+          success: false,
+          error: `Proxy error: ${err.message}`,
+        });
+      }
     },
+    // Timeout settings
+    timeout: 30000,
+    proxyTimeout: 30000,
   })
 );
 
