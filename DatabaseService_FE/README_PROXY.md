@@ -3,6 +3,7 @@
 ## Mô tả
 
 Frontend server sử dụng Node.js + Express để:
+
 1. Serve static files (HTML, CSS, JS)
 2. Proxy API requests từ browser đến Backend EC2 Private
 
@@ -97,7 +98,7 @@ sudo journalctl -u database-service-frontend -f
 Sửa file `server.js`:
 
 ```javascript
-const BACKEND_URL = 'http://10.0.4.123:5003'; // Private IP of BE EC2
+const BACKEND_URL = "http://10.0.4.123:5003"; // Private IP of BE EC2
 ```
 
 ### Thay đổi Port
@@ -149,4 +150,3 @@ Xem logs của proxy server:
 # Nếu dùng systemd
 sudo journalctl -u database-service-frontend -f
 ```
-
