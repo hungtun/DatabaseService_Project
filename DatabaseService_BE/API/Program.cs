@@ -29,7 +29,23 @@ builder.Services.AddScoped<TableService>();
 builder.Services.AddScoped<ColumnService>();
 
 // CORS configuration for frontend
-// Cho phép tất cả origins trong VPC (không cần cấu hình lại khi IP thay đổi)
+var allowedOrigins = new List<string>
+{
+    "http://localhost:5500",
+    "http://localhost:5500",
+    "http://127.0.0.1:5500"
+};
+
+// Lấy PublicIp từ appsettings (appsettings.json / appsettings.Development.json)
+var publicIp = builder.Configuration["PublicIp"];
+
+if (!string.IsNullOrWhiteSpace(publicIp))
+{
+    allowedOrigins.Add($"http://{publicIp}:5500");
+    allowedOrigins.Add($"http://{publicIp}:5003");
+}
+
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>

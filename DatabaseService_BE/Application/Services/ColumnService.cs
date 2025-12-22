@@ -64,6 +64,7 @@ public class ColumnService
                 DATA_TYPE,
                 IS_NULLABLE,
                 COLUMN_KEY,
+                EXTRA,
                 COLUMN_DEFAULT,
                 CHARACTER_MAXIMUM_LENGTH
             FROM INFORMATION_SCHEMA.COLUMNS
@@ -82,8 +83,9 @@ public class ColumnService
                 DataType = reader.GetString(1),
                 IsNullable = reader.GetString(2) == "YES",
                 IsPrimaryKey = reader.GetString(3) == "PRI",
-                DefaultValue = reader.IsDBNull(4) ? null : reader.GetString(4),
-                MaxLength = reader.IsDBNull(5) ? null : reader.GetInt32(5)
+                IsAutoIncrement = !reader.IsDBNull(4) && reader.GetString(4).Contains("auto_increment", StringComparison.OrdinalIgnoreCase),
+                DefaultValue = reader.IsDBNull(5) ? null : reader.GetString(5),
+                MaxLength = reader.IsDBNull(6) ? null : reader.GetInt32(6)
             });
         }
 

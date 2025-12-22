@@ -75,7 +75,7 @@ function renderDatabaseTree() {
                 <span>${escapeHtml(name)}</span>
             </div>
         `;
-        
+
         if (isExpanded && explorerTablesCache[id]) {
             html += '<div class="table-list-container">';
             explorerTablesCache[id].forEach(table => {
@@ -343,9 +343,11 @@ async function loadDataTab(container) {
 
         if (rows.length === 0) {
             container.innerHTML = `
-                <div style="padding: 20px;">
-                    <div class="info-text">Chưa có dữ liệu trong bảng</div>
-                    <button class="btn btn-primary" onclick="openInsertRow(${explorerCurrentDatabaseId}, '${explorerCurrentTableName}')">Thêm dữ liệu đầu tiên</button>
+                <div style="padding: 20px; min-height: 260px; display: flex; align-items: center; justify-content: center;">
+                    <div style="text-align: center;">
+                        <div class="info-text" style="margin-bottom: 12px;">Chưa có dữ liệu trong bảng</div>
+                        <button class="btn btn-primary" onclick="openInsertRow(${explorerCurrentDatabaseId}, '${explorerCurrentTableName}')">Thêm dữ liệu đầu tiên</button>
+                    </div>
                 </div>
             `;
             return;
@@ -516,6 +518,7 @@ async function openCreateTable() {
     const modal = document.getElementById('createTableModal');
     const nameInput = document.getElementById('createTableName');
     const pkCheckbox = document.getElementById('createTableIdPrimaryKey');
+    const autoIncCheckbox = document.getElementById('createTableIdAutoIncrement');
     const errorDiv = document.getElementById('createTableError');
     const infoDiv = document.getElementById('createTableInfo');
 
@@ -523,6 +526,7 @@ async function openCreateTable() {
 
     nameInput.value = '';
     if (pkCheckbox) pkCheckbox.checked = true;
+    if (autoIncCheckbox) autoIncCheckbox.checked = true;
     errorDiv.textContent = '';
     if (infoDiv) infoDiv.style.display = 'block';
 
@@ -576,8 +580,8 @@ async function openInsertRow(databaseId, tableName) {
             const isPrimaryKey = col.isPrimaryKey ?? col.IsPrimaryKey;
             const defaultValue = col.defaultValue ?? col.DefaultValue;
 
-            // Skip auto-increment columns
-            if (dataType.toLowerCase().includes('auto_increment') || (isPrimaryKey && name.toLowerCase() === 'id')) {
+            // Skip id column if it's primary key (usually auto increment) to avoid requiring it on insert
+            if (dataType.toLowerCase().includes('auto_increment') || (name.toLowerCase() === 'id' && isPrimaryKey)) {
                 return;
             }
 
@@ -799,6 +803,7 @@ function setupCreateTableModal() {
         submitBtn.addEventListener('click', async function() {
             const nameInput = document.getElementById('createTableName');
             const pkCheckbox = document.getElementById('createTableIdPrimaryKey');
+            const autoIncCheckbox = document.getElementById('createTableIdAutoIncrement');
             const errorDiv = document.getElementById('createTableError');
 
             if (!explorerCurrentDatabaseId) {
@@ -814,13 +819,20 @@ function setupCreateTableModal() {
                 return;
             }
 
-            const makePk = pkCheckbox ? pkCheckbox.checked : true;
+            const makeAutoInc = autoIncCheckbox ? autoIncCheckbox.checked : true;
+            let makePk = pkCheckbox ? pkCheckbox.checked : true;
+
+            // MySQL requires AUTO_INCREMENT column to be indexed (PRIMARY KEY or UNIQUE).
+            if (makeAutoInc && !makePk) {
+                makePk = true;
+                if (pkCheckbox) pkCheckbox.checked = true;
+            }
 
             const columns = [{
                 name: 'id',
                 dataType: 'INT',
                 isPrimaryKey: makePk,
-                isAutoIncrement: false,
+                isAutoIncrement: makeAutoInc,
                 isNullable: false
             }];
 
