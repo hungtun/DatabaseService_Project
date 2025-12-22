@@ -1,7 +1,7 @@
 // Cấu hình ứng dụng
 const CONFIG = {
-    // URL backend API
-    API_BASE_URL: 'http://98.84.20.38:5003/api',
+    // URL backend API - Sử dụng relative path, FE server sẽ proxy đến BE
+    API_BASE_URL: '/api',
 
     // Thời gian timeout cho request (ms)
     REQUEST_TIMEOUT: 30000,

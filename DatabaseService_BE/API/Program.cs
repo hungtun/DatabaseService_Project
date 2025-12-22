@@ -29,29 +29,39 @@ builder.Services.AddScoped<TableService>();
 builder.Services.AddScoped<ColumnService>();
 
 // CORS configuration for frontend
-var allowedOrigins = new List<string>
-{
-    "http://localhost:5500",
-    "http://127.0.0.1:5500"
-};
-
-// Lấy PublicIp từ appsettings (appsettings.json / appsettings.Development.json)
-var publicIp = builder.Configuration["PublicIp"];
-
-if (!string.IsNullOrWhiteSpace(publicIp))
-{
-    allowedOrigins.Add($"http://{publicIp}:5500");
-    allowedOrigins.Add($"http://{publicIp}:5003");
-}
-
+// Cho phép tất cả origins trong VPC (không cần cấu hình lại khi IP thay đổi)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins(allowedOrigins.ToArray())
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials();
+        // Cho phép localhost, private IPs trong VPC (10.0.x.x), và public IPs
+        // Không cần cập nhật lại khi Public IP thay đổi
+        policy.SetIsOriginAllowed(origin =>
+        {
+            if (string.IsNullOrEmpty(origin))
+                return false;
+
+            var uri = new Uri(origin);
+            var host = uri.Host;
+
+            // Cho phép localhost
+            if (host == "localhost" || host == "127.0.0.1")
+                return true;
+
+            // Cho phép private IPs trong VPC (10.0.0.0/16)
+            if (host.StartsWith("10.0."))
+                return true;
+
+            // Cho phép public IPs (bất kỳ IP nào)
+            // Có thể giới hạn lại nếu cần bảo mật hơn
+            if (System.Net.IPAddress.TryParse(host, out _))
+                return true;
+
+            return false;
+        })
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials();
     });
 });
 
