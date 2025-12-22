@@ -1,7 +1,7 @@
 // Cấu hình ứng dụng
 const CONFIG = {
     // URL backend API
-    API_BASE_URL: 'http://13.221.197.176:5003/api',
+    API_BASE_URL: 'http://10.0.4.123:5003/api',
 
     // Thời gian timeout cho request (ms)
     REQUEST_TIMEOUT: 30000,
